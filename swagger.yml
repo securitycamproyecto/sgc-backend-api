@@ -1,0 +1,59 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost:8000/api
+    description: Development server
+info:
+  description: This is a provider resolver for did ev
+  version: "1.0.0"
+  title: Ev Resolver Driver
+  contact:
+    email: jmirandr@nttdata.com
+paths:
+  /identifiers/{identifier}:
+    get:
+      summary: Resolve a DID.
+      description:
+        <p>This endpoint resolves a DID. As input it takes the DID, plus DID resolution <a href="https://www.w3.org/TR/did-core/#did-resolution-options">options</a>. The output is a DID document in one of the supported representations, plus metadata.</p> <p>See the <a href="https://w3c-ccg.github.io/did-resolution/">DID Resolution</a> specification for additional details.</p>
+      operationId: resolve
+      parameters:
+        - in: path
+          required: true
+          name: identifier
+          schema:
+            type: string
+          description: The DID to be resolved.
+          examples:
+            example1:
+              value: did:ev:cwMLAqQCguxLzd1biFQH4xpy2M7BZXvvcXKZ7
+              description: A DID using the `ev` method.
+        - in: header
+          required: false
+          name: Accept
+          schema:
+            type: string
+          description: The requested media type of the DID document representation or DID resolution result. See <a href="https://www.w3.org/TR/did-core/#representations">https://www.w3.org/TR/did-core/#representations</a> and <a href="https://w3c-ccg.github.io/did-resolution/#did-resolution-result">https://w3c-ccg.github.io/did-resolution/#did-resolution-result</a>.
+          examples:
+            application/did+json:
+              value: application/json
+              description: Media type of a DID document (JSON representation).
+            application/did+ld+json:
+              value: application/did+ld+json
+              description: Media type of a DID document (JSON-LD representation).
+      responses:
+        '200':
+          description: successfully resolved!
+          content:
+            application/did+json:
+              schema:
+                type: object
+                description: The DID document (JSON representation).
+                example: {"id":"did:ev:2uzPtwJmXbBqMmP9DkR7dE3FcLmgYejdJ42","authentication":[{"id":"did:ev:2uzPtwJmXbBqMmP9DkR7dE3FcLmgYejdJ42#keys-1","type":"EcdsaSecp256k1RecoveryMethod2020","blockchainAccountId":"eip155:1:0xaeaefd50a2c5cda393e9a1eef2d6ba23f2c4fd6d"}]}
+            application/did+ld+json:
+              schema:
+                type: object
+                description: The DID document (JSON-LD representation).
+                example: {"@context":"https://w3id.org/did/v1","id":"did:ev:2uzPtwJmXbBqMmP9DkR7dE3FcLmgYejdJ42","authentication":[{"id":"did:ev:2uzPtwJmXbBqMmP9DkR7dE3FcLmgYejdJ42#keys-1","type":"EcdsaSecp256k1RecoveryMethod2020","blockchainAccountId":"eip155:1:0xaeaefd50a2c5cda393e9a1eef2d6ba23f2c4fd6d"}]}
+        '400':
+          description: invalid input!
+        '500':
+          description: error!
