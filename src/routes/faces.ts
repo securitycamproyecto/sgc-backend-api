@@ -19,14 +19,14 @@ class FacesRoutes {
     private routes(): void {
 
         this.express.get("/", async (req, res, next) => {
-            if (!req.body.peopleId) { res.status(400).json('Request not contains field "peopleId"'); return; };
+            if (!req.query.peopleId) { res.status(400).json('Request not contains field "peopleId"'); return; };
             try {
-                logger.info(`Getting images: ${req.body.peopleId}`);
-                const images = await Faces.getImages(req.body.peopleId);
-                logger.info(`${req.body.peopleId} images was getted`);
+                logger.info(`Getting images: ${req.query.peopleId}`);
+                const images = await Faces.getImages(req.query.peopleId as string);
+                logger.info(`${req.query.peopleId} images was getted`);
                 res.status(200).json(images);
             } catch (error: any) {
-                const responseMessage = `Can't get ${req.body.peopleId} images`;
+                const responseMessage = `Can't get ${req.query.peopleId} images`;
                 logger.error(`${responseMessage} - details: ${error.message}`);
                 res.status(500).json(responseMessage);
             }
@@ -47,6 +47,23 @@ class FacesRoutes {
                 res.status(200).json(`Image ${uuid} was uploaded`);
             } catch (error: any) {
                 const responseMessage = `Can't upload image: ${req.file?.originalname}`;
+                logger.error(`${responseMessage} - details: ${error.message}`);
+                res.status(500).json(responseMessage);
+            }
+        });
+
+        this.express.delete("/:date", async (req, res, next) => {
+            if (!req.body.bucket) { res.status(400).json('Request not contains field "bucket"'); return; }
+            if (!req.body.collection) { res.status(400).json('Request not contains field "collection"'); return; }
+            if (!req.body.facesIds) { res.status(400).json('Request not contains field "facesIds"'); return; }
+            if (!req.body.externalFacesIds) { res.status(400).json('Request not contains field "externalFacesIds"'); return; }
+            try {
+                logger.info(`Removing image: ${req.body.facesIds.join()}`);
+                await Faces.deleteFaces(req.body.bucket, req.body.collection, req.body.facesIds, req.body.externalFacesIds);
+                logger.info(`Image ${req.body.facesIds.join()} was removed`);
+                res.status(200).json(`Image ${req.body.facesIds.join()} was removed`);
+            } catch (error: any) {
+                const responseMessage = `Can't remove image: ${req.body.facesIds.join()}`;
                 logger.error(`${responseMessage} - details: ${error.message}`);
                 res.status(500).json(responseMessage);
             }

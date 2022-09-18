@@ -8,7 +8,7 @@ const insertImageToBucket = async (bucketName: string, key: string, blob: any) =
 
 const processImageInRekognition = async (bucketName: string, collectionId: string, key: string) => {
     const rekognition = new Rekognition();
-    return rekognition.indexFaces({CollectionId: collectionId, Image: { S3Object: { Bucket: bucketName, Name: key }}}).promise();
+    return rekognition.indexFaces({CollectionId: collectionId, Image: { S3Object: { Bucket: bucketName, Name: key }}, DetectionAttributes: ['ALL'], ExternalImageId: key}).promise();
 }
 
 const insertImageDetailsToDynamoDB = async (clientId: string, key: string, face: Rekognition.Face, peopleId: string) => {
@@ -19,7 +19,7 @@ const insertImageDetailsToDynamoDB = async (clientId: string, key: string, face:
     formatItem['externalImageId'] = { 'S': key };
     formatItem['clientId'] = { 'S': clientId };
     formatItem['peopleId'] = { 'S': peopleId };
-    dynamodb.putItem({TableName: DYNAMO_DB_FACES_TABLE, Item: formatItem}).promise();
+    return dynamodb.putItem({TableName: DYNAMO_DB_FACES_TABLE, Item: formatItem}).promise();
 }
 
 const uploadAndProcessImage = async (bucketName: string, collectionId: string, clientId: string, key: string, blob: any, peopleId: string) => {
@@ -36,6 +36,7 @@ const getImages = async (peopleId: string) => {
     // const allImages = await s3.listObjects({Bucket: bucketName}).promise();
     const params = {
         TableName: DYNAMO_DB_FACES_TABLE, 
+        IndexName: 'peopleId-index',
         KeyConditionExpression: 'peopleId = :peopleId', 
         ExpressionAttributeValues: {
             ':peopleId': { S: peopleId }
@@ -45,13 +46,40 @@ const getImages = async (peopleId: string) => {
     const images: Array<{[key:string]: string}> = [];
     const faceItems = faceRecords.Items || [];
     for (const faceItem of faceItems) {
-        images.push({name: faceItem.externalImageId.S || ''});
+        images.push({id: faceItem.id.S || '', externalImageId: faceItem.externalImageId.S || ''});
     }
 
     return images;
 }
 
+const deleteFacesFromRekognition = async (collectionId: string, keys: Array<string>) => {
+    const rekognition = new Rekognition();
+    return rekognition.deleteFaces({CollectionId: collectionId, FaceIds: keys}).promise();
+}
+
+const deleteFacesFromBucket = async (bucketName: string, keys: Array<string>) => {
+    const s3 = new S3();
+    const objects = keys.map((x) => ({Key: x}));
+    return s3.deleteObjects({Bucket: bucketName, Delete: {Objects: objects}}).promise();
+}
+
+const deleteImagesFromDynamoDB = async (id: string) => {
+    const dynamodb = new DynamoDB();
+    return dynamodb.deleteItem({TableName: DYNAMO_DB_FACES_TABLE, Key: { id: { S: id }}}).promise();
+}
+
+export const deleteFaces = async (bucketName: string, collectionId: string, facesIds: Array<string>, externalFacesIds: Array<string>) => {
+    if (facesIds.length > 0)
+        await deleteFacesFromRekognition(collectionId, facesIds);
+    if (externalFacesIds.length > 0)
+        await deleteFacesFromBucket(bucketName, externalFacesIds);
+    for (const id of facesIds) {
+        await deleteImagesFromDynamoDB(id);
+    }
+}
+
 export default {
     uploadAndProcessImage,
-    getImages
+    getImages,
+    deleteFaces
 }

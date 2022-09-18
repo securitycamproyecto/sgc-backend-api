@@ -14,7 +14,7 @@ const getPeople = async (clientId: string) => {
     return dynamodb.query(params).promise();
 }
 
-const createPerson = async (newClient: any, uuid: any) => {
+const putPerson = async (newClient: any, uuid: any) => {
     const dynamodb = new DynamoDB({apiVersion: '2012-08-10'});
     const formatItem: any = {};
     formatItem['id'] = { 'S': uuid };
@@ -37,7 +37,7 @@ const deletePerson = async (uuid: any) => {
 }
 
 export default {
-    createPerson,
+    putPerson,
     deletePerson,
     getPeople
 }
