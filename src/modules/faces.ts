@@ -24,11 +24,16 @@ const insertImageDetailsToDynamoDB = async (clientId: string, key: string, face:
 
 const uploadAndProcessImage = async (bucketName: string, collectionId: string, clientId: string, key: string, blob: any, peopleId: string) => {
     await insertImageToBucket(bucketName, key, blob);
+    console.log(1);
     const rekognitionResult = await processImageInRekognition(bucketName, collectionId, key);
+    console.log(2);
     const facesRecords = rekognitionResult.FaceRecords || [];
-    if (facesRecords?.length === 0) throw 'Not faces found';
+    console.log(3, facesRecords);
+    if (facesRecords.length === 0) throw 'Not faces found';
     const face = facesRecords[0].Face || {};
+    console.log(4);
     await insertImageDetailsToDynamoDB(clientId, key, face, peopleId);
+    console.log(5);
 }
 
 const getImages = async (peopleId: string) => {
@@ -47,6 +52,27 @@ const getImages = async (peopleId: string) => {
     const faceItems = faceRecords.Items || [];
     for (const faceItem of faceItems) {
         images.push({id: faceItem.id.S || '', externalImageId: faceItem.externalImageId.S || ''});
+    }
+
+    return images;
+}
+
+const getImagesByClientId = async (clientId: string) => {
+    const dynamodb = new DynamoDB();
+    // const allImages = await s3.listObjects({Bucket: bucketName}).promise();
+    const params = {
+        TableName: DYNAMO_DB_FACES_TABLE, 
+        IndexName: 'clientId-index',
+        KeyConditionExpression: 'clientId = :clientId', 
+        ExpressionAttributeValues: {
+            ':clientId': { S: clientId }
+        }
+    };
+    const faceRecords = await dynamodb.query(params).promise();
+    const images: Array<{[key:string]: string}> = [];
+    const faceItems = faceRecords.Items || [];
+    for (const faceItem of faceItems) {
+        images.push({id: faceItem.id.S || '', externalImageId: faceItem.externalImageId.S || '', peopleId: faceItem.peopleId.S || ''});
     }
 
     return images;
@@ -81,5 +107,6 @@ export const deleteFaces = async (bucketName: string, collectionId: string, face
 export default {
     uploadAndProcessImage,
     getImages,
+    getImagesByClientId,
     deleteFaces
 }

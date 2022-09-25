@@ -9,10 +9,12 @@ dotenv.config();
 class Identifiers {
 
     public express: express.Application;
+    public tokens: Array<string>;
 
     constructor() {
         this.express = express();
         this.routes();
+        this.tokens = [];
     }
 
     private routes(): void {
@@ -44,6 +46,24 @@ class Identifiers {
                 logger.error(`${responseMessage} - details: ${error.message}`);
                 res.status(500).json(responseMessage);
             }
+        });
+
+        this.express.get("/list/:userId", async (req, res, next) => {
+            if (!req.params.userId) { res.status(400).json('Request not contains field "userId"'); return; }
+            try {
+                logger.info(`Getting notification`);
+                const result = await Notifications.getNotifications(req.params.userId as string);
+                res.status(200).json(result);
+            } catch (error: any) {
+                const responseMessage = `Can't get notifications`;
+                logger.error(`${responseMessage} - details: ${error.message}`);
+                res.status(500).json(responseMessage);
+            }
+        });
+
+        this.express.post("/send-notification", async (req, res, next) => {
+            await Notifications.sendNotificationPrueba('68fdd0e1-7520-4fa4-969c-efe4f7cc31b2');
+            res.status(200).send('prueba');
         });
     }
 }

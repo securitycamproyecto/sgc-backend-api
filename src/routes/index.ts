@@ -7,6 +7,7 @@ import People from "./people";
 import NotificationsConfig from "./notifications";
 import Lambda from "./lambda";
 import Analysis from "./analysis";
+import Reports from "./reports";
 
 class Routes {
 
@@ -24,6 +25,7 @@ class Routes {
         this.express.use("/people", People);
         this.express.use("/notifications-config", NotificationsConfig);
         this.express.use("/analysis", Analysis);
+        this.express.use("/reports", Reports);
 
         this.express.use("/lambda", Lambda);
     }
