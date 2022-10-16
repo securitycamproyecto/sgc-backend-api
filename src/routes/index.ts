@@ -10,6 +10,7 @@ import Analysis from "./analysis";
 import Reports from "./reports";
 import Support from "./support";
 import Users from "./users";
+import Devices from "./devices";
 
 class Routes {
 
@@ -29,7 +30,8 @@ class Routes {
         this.express.use("/analysis", Analysis);
         this.express.use("/reports", Reports);
         this.express.use("/support", Support)
-        this.express.use("/users", Users)
+        this.express.use("/users", Users);
+        this.express.use("/devices", Devices);
 
         this.express.use("/lambda", Lambda);
     }
