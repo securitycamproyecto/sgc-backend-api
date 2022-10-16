@@ -8,6 +8,8 @@ import NotificationsConfig from "./notifications";
 import Lambda from "./lambda";
 import Analysis from "./analysis";
 import Reports from "./reports";
+import Support from "./support";
+import Users from "./users";
 
 class Routes {
 
@@ -26,6 +28,8 @@ class Routes {
         this.express.use("/notifications-config", NotificationsConfig);
         this.express.use("/analysis", Analysis);
         this.express.use("/reports", Reports);
+        this.express.use("/support", Support)
+        this.express.use("/users", Users)
 
         this.express.use("/lambda", Lambda);
     }

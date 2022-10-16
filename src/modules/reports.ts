@@ -3,7 +3,7 @@ import { DYNAMO_DB_ANALYSIS_TABLE } from './constants';
 import People from './people';
 import moment from 'moment';
 
-const getReport = async (clientId: string, endDate: string) => {
+const getReport = async (clientId: string, startDate: string) => {
     const dynamodb = new DynamoDB({apiVersion: '2012-08-10'});
     const params: DynamoDB.QueryInput = {
         TableName: DYNAMO_DB_ANALYSIS_TABLE, 
@@ -17,14 +17,15 @@ const getReport = async (clientId: string, endDate: string) => {
     const recordItems = records.Items || [];
     const result: any = { };
     for (const item of recordItems) {
-        const date = moment(new Date(item.date.S as string)).format('DD-MM-YYYY');
-        if (new Date(date).getTime() > new Date(endDate).getTime()) continue;
+        const date = moment(new Date(item.date.S as string)).format('YYYY-MM-DD');
+        if (moment(date).isBefore(moment(startDate))) continue;
         if (!Object.keys(result).some((x: string)=>x===date)) {
             result[date] = 1;
         } else {
             result[date]++;
         }
     }
+    console.log(result);
     return result;
 }
 
