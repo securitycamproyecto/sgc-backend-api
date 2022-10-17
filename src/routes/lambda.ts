@@ -48,7 +48,7 @@ class PeopleRoutes {
             try {
                 logger.info(`Sanding message to socket: ${JSON.stringify(req.body)}`);
                 const body = `Se indentifico a una persona con el tag: ${req.body.currentFace} - analizando...`
-                this.socket.emit('message', {clientId: req.body.clientId, body});
+                this.socket.emit('message', {clientId: req.body.clientId, deviceId: req.body.deviceId, body});
                 res.status(200).json(req.body);
             } catch (error: any) {
                 const responseMessage = `Can't saved result from lambda`;

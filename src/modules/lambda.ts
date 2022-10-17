@@ -1,13 +1,14 @@
 import { DynamoDB, KinesisVideo, KinesisVideoArchivedMedia, S3 } from 'aws-sdk';
 import Notifications from './notifications';
 
-const saveOnDynamoDB = async (uuid: string, currentFace: string, clientId: string, informationResult: any) => {
+const saveOnDynamoDB = async (uuid: string, currentFace: string, clientId: string, deviceId: string, informationResult: any) => {
     console.log('===SAVING DYNAMODB===');
     const dynamodb = new DynamoDB({apiVersion: '2012-08-10'});
     const formatItem = {
         id: { 'S': uuid },
         label: { 'S': currentFace },
         clientId: { 'S': clientId },
+        deviceId: { 'S': deviceId },
         kinesisVideo: { 'S': JSON.stringify(informationResult.kinesisVideo) },
         detectedFaces: { 'S': JSON.stringify(informationResult.detectedFaces) },
         matchedFaces: { 'S': JSON.stringify(informationResult.matchedFaces) },
@@ -91,9 +92,9 @@ const saveMediaOnS3Prueba = async (uuid: string, startTimestamp: number, endTime
 const saveResultFromLambda = async (body: any, socket: any) => {
     const startTimestamp = body.informationResult.kinesisVideo[0].ServerTimestamp;
     const endTimestamp = body.informationResult.kinesisVideo[body.informationResult.kinesisVideo.length - 1].ServerTimestamp + 10;
-    await saveOnDynamoDB(body.uuid, body.currentFace, body.clientId, body.informationResult);
+    await saveOnDynamoDB(body.uuid, body.currentFace, body.clientId, body.deviceId, body.informationResult);
     await saveMediaOnS3(body.uuid, startTimestamp, endTimestamp);
-    Notifications.sendNotification(socket, body.uuid, body.clientId,  body.informationResult.matchedFaces, body.currentFace);
+    Notifications.sendNotification(socket, body.uuid, body.clientId, body.deviceId, body.informationResult.matchedFaces, body.currentFace);
 }
 
 export default {

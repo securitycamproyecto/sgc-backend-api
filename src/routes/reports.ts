@@ -16,12 +16,13 @@ class FacesRoutes {
 
     private routes(): void {
 
-        this.express.get("/:clientId/:startDate", async (req, res, next) => {
+        this.express.get("/:clientId/:deviceId/:startDate", async (req, res, next) => {
             if (!req.params.clientId) { res.status(400).json('Request not contains field "clientId"'); return; };
+            if (!req.params.deviceId) { res.status(400).json('Request not contains field "deviceId"'); return; };
             if (!req.params.startDate) { res.status(400).json('Request not contains field "startDate"'); return; };
             try {
                 logger.info(`Getting report: ${req.params.clientId}`);
-                const result = await Reports.getReport(req.params.clientId, req.params.startDate);
+                const result = await Reports.getReport(req.params.clientId, req.params.deviceId, req.params.startDate);
                 logger.info(`${req.params.clientId} report was getted`);
                 res.status(200).json(result);
             } catch (error: any) {

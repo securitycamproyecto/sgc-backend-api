@@ -49,7 +49,7 @@ const putDevices = async (newDevice: any, uuid: any, createServices: boolean) =>
         await rekognition.startStreamProcessor({Name: services.StreamProcessor.name}).promise();
 
         const lambda = new Lambda();
-        const blobFunction = await zip.file('index.zip', functionTemplate(newDevice.clientId)).generateAsync({type:"arraybuffer"});
+        const blobFunction = await zip.file('index.zip', functionTemplate(uuid, newDevice.clientId)).generateAsync({type:"arraybuffer"});
         await lambda.createFunction({
             Code: { ZipFile: blobFunction },
             FunctionName: uuid,
@@ -98,7 +98,7 @@ const deleteDevices = async (uuid: any, services: any) => {
     await kinesisVideo.deleteStream({StreamARN: services.KinesisVideoStream.arn}).promise();
 }
 
-const functionTemplate = (clientId: string) => {
+const functionTemplate = (uuid: string, clientId: string) => {
     return `
         const { v4 } = require('uuid');
         const axios = require('axios');
@@ -106,6 +106,7 @@ const functionTemplate = (clientId: string) => {
 
         console.log('Loading function');
         const clientId = '${clientId}';
+        const deviceId = '${uuid}';
         let currentFace = '';
         let informationResult = {
             kinesisVideo: [],
@@ -123,8 +124,8 @@ const functionTemplate = (clientId: string) => {
                     if (informationResult.detectedFaces.length > 0) {
                         ///////////////////////////////////
                         const uuid = v4();
-                        axios.post(url + '/lambda/message', {clientId, currentFace});
-                        axios.post(url + '/lambda/result', {uuid, currentFace, clientId, informationResult});
+                        axios.post(url + '/lambda/message', {clientId, deviceId, currentFace});
+                        axios.post(url + '/lambda/result', {uuid, currentFace, clientId, deviceId, informationResult});
                         ///////////////////////////////////
                     }
                     currentFace = '';
@@ -146,8 +147,8 @@ const functionTemplate = (clientId: string) => {
                         ///////////////////////////////////
                         if (currentFace !== '') {
                             const uuid = v4();
-                            axios.post(url + '/lambda/message', {clientId, currentFace});
-                            axios.post(url + '/lambda/result', {uuid, currentFace, clientId, informationResult});
+                            axios.post(url + '/lambda/message', {clientId, deviceId, currentFace});
+                            axios.post(url + '/lambda/result', {uuid, currentFace, clientId, deviceId, informationResult});
                         }
                         ///////////////////////////////////
                         currentFace = externalImageId;

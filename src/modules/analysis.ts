@@ -40,6 +40,7 @@ const getRecord = async (id: string, clientId: string) => {
             label: item.label.S,
             // matchedFace: matchedFace,
             // detectedFace: detectedFace,
+            deviceId: item.deviceId?.S || 'd1a552e7-27ff-42d3-95e1-a35c97c2c1b8',
             names,
             type,
             similarity
@@ -87,6 +88,7 @@ const getRecords = async (clientId: string) => {
             label: item.label.S,
             // matchedFace: matchedFace,
             // detectedFace: detectedFace,
+            deviceId: item.deviceId?.S || 'd1a552e7-27ff-42d3-95e1-a35c97c2c1b8',
             names,
             type,
             similarity

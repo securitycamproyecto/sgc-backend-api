@@ -105,7 +105,7 @@ const sendNotificationPrueba = async (clientId: string) => {
     }
 }
 
-const sendNotification = async (socket: any, uuid: string, clientId: string, matchedFaces: Array<any>, currentFace: string) => {
+const sendNotification = async (socket: any, uuid: string, clientId: string, deviceId: string, matchedFaces: Array<any>, currentFace: string) => {
     // const result = await Analysis.getResult(clientId, );
     const analysisResult = await Analysis.getResult(clientId, matchedFaces, currentFace);
     const notificationResult = await getNotificationConfigByClient(clientId);
@@ -130,7 +130,7 @@ const sendNotification = async (socket: any, uuid: string, clientId: string, mat
                         },
                         data: { recordId: uuid, clientId, title: date}
                     });
-                    socket.emit('message', {clientId, body});
+                    socket.emit('message', {clientId, deviceId, body});
                 } catch (err) { console.log('Firebase sendToDevice', err); }
                 await saveNotification(uuid, config.userId.S as string, clientId, analysisResult.type, body, date);
             }
