@@ -78,9 +78,9 @@ class Identifiers {
             if (!params.userId) { res.status(400).json('Request not contains field "userId"'); return; }
             try {
                 logger.info(`Getting client by userId: ${params.userId}`);
-                await Clients.getClientByUser(params.userId);
+                const result = await Clients.getClientByUser(params.userId);
                 logger.info(`Client by userId ${params.userId} was getted`);
-                res.status(200).json(params);
+                res.status(200).json(result);
             } catch (error: any) {
                 const responseMessage = `Can't getting client by userId: ${params.userId}`;
                 logger.error(`${responseMessage} - details: ${error.message}`);

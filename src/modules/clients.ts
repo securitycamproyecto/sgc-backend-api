@@ -36,10 +36,12 @@ const getClientByUser = async (userId: string) => {
     for (const client of clients) {
         const users = JSON.parse(client.users.S || '[]');
         if (users.some((x: any) => x.id === userId)) {
+            console.log()
             result = client.id.S;
             break;
         }
     }
+    return result;
 }
 
 export default {

@@ -30,7 +30,7 @@ const putDevices = async (newDevice: any, uuid: any, createServices: boolean) =>
     const services = newDevice.services || {};
     if (createServices) {
         const kinesisVideo = new KinesisVideo();
-        const kinesisVideoStream = await kinesisVideo.createStream({StreamName: uuid}).promise();
+        const kinesisVideoStream = await kinesisVideo.createStream({StreamName: uuid, DataRetentionInHours: 24}).promise();
         services.KinesisVideoStream = { name: uuid, arn: kinesisVideoStream.StreamARN }
 
         const kinesis = new Kinesis();
