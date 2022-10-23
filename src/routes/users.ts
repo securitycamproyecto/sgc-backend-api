@@ -27,6 +27,19 @@ class UsersRoutes {
                 res.status(500).json(responseMessage);
             }
         });
+
+        this.express.post("/:username", async (req, res, next) => {
+            try {
+                logger.info(`Delete users`);
+                await Users.deleteUser(req.params.username);
+                logger.info(`Users was deleted`);
+                return res.status(200).send('OK');
+            } catch (error: any) {
+                const responseMessage = `Can't delete users`;
+                logger.error(`${responseMessage} - details: ${error.message}`);
+                return res.status(500).json(responseMessage);
+            }
+        });
     }
 }
 

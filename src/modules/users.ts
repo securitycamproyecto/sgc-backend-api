@@ -6,6 +6,16 @@ const getUsers = async () => {
     return users.Users || [];
 }
 
+const deleteUser = async (username: string) => {
+    const cognitoIdentityServiceProvider = new CognitoIdentityServiceProvider();
+    const params: CognitoIdentityServiceProvider.AdminDeleteUserRequest = {
+        Username: username,
+        UserPoolId: 'us-east-1_mexzqUREw'
+    };
+    await cognitoIdentityServiceProvider.adminDeleteUser(params).promise();
+}
+
 export default {
-    getUsers
+    getUsers,
+    deleteUser
 }
