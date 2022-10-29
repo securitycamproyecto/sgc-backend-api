@@ -3,6 +3,7 @@ import logger from "../logger";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import Devices from './../modules/devices';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ class DevicesRoutes {
     }
 
     private routes(): void {
+
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             try {
@@ -86,21 +89,6 @@ class DevicesRoutes {
                 res.status(500).json(responseMessage);
             }
         });
-
-        // this.express.get("/:userId", async (req, res, next) => {
-        //     const { params } = req;
-        //     if (!params.userId) { res.status(400).json('Request not contains field "userId"'); return; }
-        //     try {
-        //         logger.info(`Getting client by userId: ${params.userId}`);
-        //         await Clients.getClientByUser(params.userId);
-        //         logger.info(`Client by userId ${params.userId} was getted`);
-        //         res.status(200).json(params);
-        //     } catch (error: any) {
-        //         const responseMessage = `Can't getting client by userId: ${params.userId}`;
-        //         logger.error(`${responseMessage} - details: ${error.message}`);
-        //         res.status(500).json(responseMessage);
-        //     }
-        // });
     }
 }
 

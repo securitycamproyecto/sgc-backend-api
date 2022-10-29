@@ -2,6 +2,7 @@ import express from "express";
 import logger from "../logger";
 import dotenv from 'dotenv';
 import Users from './../modules/users';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ class UsersRoutes {
     }
 
     private routes(): void {
+        
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             try {

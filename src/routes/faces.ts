@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from "../logger";
 import upload from './middlewares';
 import Faces from './../modules/faces';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ class FacesRoutes {
     }
 
     private routes(): void {
+
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             if (!req.query.peopleId) { res.status(400).json('Request not contains field "peopleId"'); return; };

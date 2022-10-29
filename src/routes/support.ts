@@ -3,6 +3,7 @@ import logger from "../logger";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import Support from './../modules/support';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ class SupportRoutes {
     }
 
     private routes(): void {
+        
+        this.express.use(authMiddleware);
 
         this.express.post("/", async (req, res, next) => {
             const { body } = req;

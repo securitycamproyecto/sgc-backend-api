@@ -7,7 +7,7 @@ import { io, Socket } from "socket.io-client";
 
 dotenv.config();
 
-class PeopleRoutes {
+class LambdaRoutes {
 
     public express: express.Application;
     public socket: Socket;
@@ -59,4 +59,4 @@ class PeopleRoutes {
     }
 }
 
-export default new PeopleRoutes().express;
+export default new LambdaRoutes().express;

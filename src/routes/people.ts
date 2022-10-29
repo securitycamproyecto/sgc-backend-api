@@ -2,9 +2,8 @@ import express from "express";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import logger from "../logger";
-import upload from './middlewares';
-import Faces from './../modules/faces';
 import People from './../modules/people';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
@@ -18,6 +17,8 @@ class PeopleRoutes {
     }
 
     private routes(): void {
+        
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             try {

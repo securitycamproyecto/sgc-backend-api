@@ -3,10 +3,11 @@ import logger from "../logger";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import Clients from './../modules/clients';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
-class Identifiers {
+class ClientsRoutes {
 
     public express: express.Application;
 
@@ -16,6 +17,8 @@ class Identifiers {
     }
 
     private routes(): void {
+
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             try {
@@ -90,4 +93,4 @@ class Identifiers {
     }
 }
 
-export default new Identifiers().express;
+export default new ClientsRoutes().express;

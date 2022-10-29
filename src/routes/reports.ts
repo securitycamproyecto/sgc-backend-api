@@ -2,10 +2,11 @@ import express from "express";
 import dotenv from 'dotenv';
 import logger from "../logger";
 import Reports from './../modules/reports';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
-class FacesRoutes {
+class ReportsRoutes {
 
     public express: express.Application;
 
@@ -15,6 +16,8 @@ class FacesRoutes {
     }
 
     private routes(): void {
+        
+        this.express.use(authMiddleware);
 
         this.express.get("/:clientId/:deviceId/:startDate", async (req, res, next) => {
             if (!req.params.clientId) { res.status(400).json('Request not contains field "clientId"'); return; };
@@ -34,4 +37,4 @@ class FacesRoutes {
     }
 }
 
-export default new FacesRoutes().express;
+export default new ReportsRoutes().express;

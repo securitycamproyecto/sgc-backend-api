@@ -3,10 +3,11 @@ import logger from "../logger";
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import Notifications from './../modules/notifications';
+import authMiddleware from "../configs/aws-cognito";
 
 dotenv.config();
 
-class Identifiers {
+class NotificationsRoutes {
 
     public express: express.Application;
     public tokens: Array<string>;
@@ -18,6 +19,8 @@ class Identifiers {
     }
 
     private routes(): void {
+        
+        this.express.use(authMiddleware);
 
         this.express.get("/", async (req, res, next) => {
             try {
@@ -68,4 +71,4 @@ class Identifiers {
     }
 }
 
-export default new Identifiers().express;
+export default new NotificationsRoutes().express;

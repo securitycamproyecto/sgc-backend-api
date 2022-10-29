@@ -1,10 +1,10 @@
 import * as bodyParser from "body-parser";
 import express from "express";
 import dotenv from 'dotenv';
-import logger from "./logger";
 
+import logger from "./logger";
 import Routes from "./routes";
-import './config';
+import './configs/config';
 
 dotenv.config();
 const port = process.env.PORT;
